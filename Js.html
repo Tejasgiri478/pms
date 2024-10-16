@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <style>
+        /* Basic styles for the form and the list */
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 300px; margin: 20px auto; }
+        ul { list-style-type: none; padding: 0; }
+        li { background-color: #f0f0f0; margin: 5px 0; padding: 10px; }
+        input { width: 70%; padding: 5px; }
+        button { padding: 5px 10px; background-color: #ffa500; border: none; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Input field for adding new to-do items -->
+        <input type="text" id="todoInput" placeholder="add new">
+        <button id="addButton">Add</button>
+
+        <!-- Unordered list to display the to-do items -->
+        <ul id="todoList">
+            <!-- Pre-existing items in the list -->
+            <li>Read a book</li>
+            <li>Lunch with Caro</li>
+            <li>Feed the dog</li>
+        </ul>
+    </div>
+
+    <script>
+        // Function to add a new to-do item to the list
+        function addTodo() {
+            // Get the value from the input field
+            const todoInput = document.getElementById("todoInput").value;
+            
+            // Check if input is not empty
+            if (todoInput.trim() !== "") {
+                // Create a new list item (li) element
+                const newItem = document.createElement("li");
+                
+                // Set the text of the new list item to the input value
+                newItem.textContent = todoInput;
+                
+                // Add the new item to the unordered list (ul)
+                document.getElementById("todoList").appendChild(newItem);
+                
+                // Store the updated list in cookies
+                saveToCookies();
+                
+                // Clear the input field after adding the item
+                document.getElementById("todoInput").value = "";
+            }
+        }
+
+        // Function to save the to-do list in cookies
+        function saveToCookies() {
+            // Get all list items and store them as an array of text
+            const items = document.querySelectorAll("#todoList li");
+            const todoArray = Array.from(items).map(item => item.textContent);
+            
+            // Convert the array to a string and store it in a cookie
+            document.cookie = "todos=" + JSON.stringify(todoArray) + "; path=/";
+        }
+
+        // Function to load the to-do list from cookies when the page loads
+        function loadFromCookies() {
+            // Get all cookies as a string and find the one with the key 'todos'
+            const cookies = document.cookie.split("; ").find(row => row.startsWith("todos="));
+            
+            // If a cookie is found, load the to-do list from it
+            if (cookies) {
+                const todoArray = JSON.parse(cookies.split("=")[1]);
+                
+                // Append each item from the cookie to the list
+                todoArray.forEach(todo => {
+                    const newItem = document.createElement("li");
+                    newItem.textContent = todo;
+                    document.getElementById("todoList").appendChild(newItem);
+                });
+            }
+        }
+
+        // Event listener for the 'Add' button
+        document.getElementById("addButton").addEventListener("click", addTodo);
+
+        // Load the to-do list from cookies when the page loads
+        window.onload = loadFromCookies;
+    </script>
+</body>
+</html>
